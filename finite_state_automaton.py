@@ -42,7 +42,7 @@ class FiniteStateAutomaton:
             current_states = next_states
         return any(state in self.final_states for state in current_states)
 
-    def draw(self, name='fsm'):
+    def draw(self, name='fsm.dot'):
         import graphviz
         dot = graphviz.Digraph('finite_state_machine', filename=f'{name}.gv')
         dot.attr(rankdir='LR', size='8,5')
@@ -60,7 +60,7 @@ class FiniteStateAutomaton:
             for next_state in next_states:
                 dot.edge(state, next_state, label=symbol)
 
-        dot.view(name)
+        dot.view(f'{name}.dot')
 
     def __str__(self):
         return f'Alphabet: {self.alphabet}\n' \
