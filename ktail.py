@@ -52,11 +52,12 @@ def rename_states(m: FSM, prefix: str = 'q') -> FSM:
     return m_new
 
 
-def generate_PTA(words: Set[str]) -> FSM:
+def generate_PTA(words: Set[str], draw_PTA=False) -> FSM:
     """Generate a PTA from the given set of words.
     Note that it uses special symbols for the initial and final states.
 
     :param words: set of words
+    :param draw_PTA: whether to draw the PTA (default: False)
     :return: PTA
     """
 
@@ -101,8 +102,13 @@ def generate_PTA(words: Set[str]) -> FSM:
         # We need to add a special final state and a transition from the last state to the special final state.
         # This is just to make the remaining computation easier.
         special_final_state = '_FINAL_'
+        m.states.add(special_final_state)
         m.final_states.add(special_final_state)
         m.transitions.setdefault((current_state, final_symbol), set()).add(special_final_state)
+
+    if draw_PTA:
+        m.draw('PTA')
+
     return m
 
 
@@ -166,12 +172,14 @@ def k_future_mapping(m: FSM, k: int, print_map=False) -> dict:
     return future_map
 
 
-def infer_model(future_map: dict) -> FSM:
+def infer_model(future_map: dict, draw_inferred_model=False) -> FSM:
     """Infer a model from the future map.
     It assumes there are special initial and final symbols used in the PTA generation step.
     They are essential to identify the initial and final states from the future map.
 
     :param future_map: future map
+    :param draw_inferred_model: whether to draw the inferred model (default: False)
+    :return: inferred model
     """
     m = FSM()
 
@@ -197,24 +205,44 @@ def infer_model(future_map: dict) -> FSM:
             if label == final_symbol:
                 m.final_states.add(str(future_dst))
 
+    # draw the inferred model if needed
+    if draw_inferred_model:
+        m.draw('inferred-model')
+
     # return the inferred model
     return m
 
 
-def ktail(words: Set[str], k: int, shorten_state_names=True) -> FSM:
+def ktail(words: Set[str], k: int, shorten_state_names=True, print_internals=False) -> FSM:
     """The k-tail algorithm that infers a model from a set of words and a given k.
 
     :param words: set of words
     :param k: the parameter k
     :param shorten_state_names: whether to shorten state names (default: True)
+    :param print_internals: whether to print the internal steps (default: False)
     :return: inferred model
     """
 
     # Step1: Generate a PTA from the given set of words
-    m = generate_PTA(words)
+    m = generate_PTA(words, draw_PTA=print_internals)
+
+    # (optional) print the future k-sequences for each state and the k-equivalent classes
+    if print_internals:
+        print('Future k-sequences:')
+        for state in natsorted(m.states):
+            print(f'future_{k}({state}) = {get_k_future(m, k, state)}')
+        print('-' * 50)
+
+        equivalent_classes = dict()
+        for state in m.states:
+            equivalent_classes.setdefault(frozenset(get_k_future(m, k, state)), set()).add(state)
+        print('Equivalent classes:')
+        for k_seq, states in equivalent_classes.items():
+            print(f'{k_seq} -> {natsorted(states)}')
 
     # Step2: Compute the future map from the PTA
-    future_map = k_future_mapping(m, k)
+    future_map = k_future_mapping(m, k, print_map=print_internals)
+    print(future_map)
 
     # Step3: Infer the model from the future map
     m_k = infer_model(future_map)
@@ -233,5 +261,5 @@ if __name__ == '__main__':
         'abb',
         'abbb'
     }
-    m = ktail(words=words, k=k)
+    m = ktail(words=words, k=k, print_internals=True)
     m.draw(f'{k}-tail-result')
