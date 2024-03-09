@@ -27,12 +27,17 @@ class FiniteStateAutomaton:
                 next_states |= self.transitions[(s, symbol)]
         return next_states
 
-    def is_accepted(self, word):
+    def is_accepted(self, word, sep=' '):
         """Check if a word is accepted by the FSM.
 
         :param word: input word
+        :param sep: separator between symbols in the word
         :return: True if the word is accepted, False otherwise
         """
+
+        # split the word into symbols
+        word = word.split(sep)
+
         current_states = [self.initial_state]
         for symbol in word:
             next_states = set()

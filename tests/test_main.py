@@ -7,12 +7,12 @@ from ktail import generate_PTA, get_k_future, k_future_mapping, rename_states, i
 class TestMain(unittest.TestCase):
     def test_generate_PTA(self):
         words = [
-            'abcd',
-            'abce'
+            'a b c d',
+            'a b c e'
         ]
         m = generate_PTA(words)
         self.assertEqual(m.alphabet, {'a', 'b', 'c', 'd', 'e', '$', '#'})
-        self.assertEqual(m.states, {'_INIT_', 's2', 's8', 's5', 's9', 's7', 's3', 's1', 's4', 's6', 's10'})
+        self.assertEqual(m.states, {'_INIT_', '_FINAL_', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'})
         self.assertEqual(m.initial_state, '_INIT_')
         self.assertEqual(m.final_states, {'_FINAL_'})
         self.assertEqual(m.transitions, {('_INIT_', '$'): {'s6', 's1'}, ('s1', 'a'): {'s2'},
@@ -118,17 +118,17 @@ class TestMain(unittest.TestCase):
 
     def test_ktail(self):
         k = 2
-        words = {
-            'abc',
-            'abd',
-            'abe'
-        }
+        words = [
+            'a b c',
+            'a b d',
+            'a b e'
+        ]
         m = ktail(words=words, k=k)
-        m = rename_states(m)
-        # m.draw('ktail_result')
-        print(m)
-        # FIXME
-
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual({'a', 'e', '#', 'b', '$', 'c', 'd'}, m.alphabet)
+        self.assertEqual({'q7', 'q5', 'q2', 'q3', 'q6', 'q8', 'q0', 'q9', 'q1', 'q4'}, m.states)
+        self.assertEqual('q0', m.initial_state)
+        self.assertEqual({'q9'}, m.final_states)
+        self.assertEqual(True, m.is_accepted('$ a b c #'))
+        self.assertEqual(True, m.is_accepted('$ a b d #'))
+        self.assertEqual(True, m.is_accepted('$ a b e #'))
+        self.assertEqual(False, m.is_accepted('a b c'))

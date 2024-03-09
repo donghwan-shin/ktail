@@ -3,12 +3,6 @@ from finite_state_automaton import FiniteStateAutomaton as FSM
 
 
 class FSMTestCase(unittest.TestCase):
-    # # remove pdf files before running tests
-    # def setUp(self) -> None:
-    #     import os
-    #     for file in os.listdir('.'):
-    #         if file.endswith('.pdf'):
-    #             os.remove(file)
 
     def test_FSM1(self):
         m = FSM()
@@ -20,9 +14,9 @@ class FSMTestCase(unittest.TestCase):
         # m.draw('fsm1')
 
         self.assertTrue(m.is_accepted('1'))
-        self.assertTrue(m.is_accepted('1111'))
+        self.assertTrue(m.is_accepted('1 1 1 1'))
         self.assertFalse(m.is_accepted('0'))
-        self.assertFalse(m.is_accepted('0000'))
+        self.assertFalse(m.is_accepted('0 0 0 0'))
 
     def test_FSM2(self):
         m = FSM()
@@ -33,19 +27,19 @@ class FSMTestCase(unittest.TestCase):
         m.transitions = {('A', '0'): {'A', 'B'}, ('A', '1'): {'B'}, ('B', '0'): {'C'}, ('B', '1'): {'A'}, ('C', '1'): {'C'}}
         # m.draw('fsm2')
 
-        self.assertTrue(m.is_accepted('00'))
-        self.assertTrue(m.is_accepted('10'))
-        self.assertTrue(m.is_accepted('101'))
-        self.assertTrue(m.is_accepted('001111'))
-        self.assertTrue(m.is_accepted('1100'))
-        self.assertTrue(m.is_accepted('0101010'))
-        self.assertTrue(m.is_accepted('0101011'))
-        self.assertTrue(m.is_accepted('00001000101011'))
+        self.assertTrue(m.is_accepted('0 0'))
+        self.assertTrue(m.is_accepted('1 0'))
+        self.assertTrue(m.is_accepted('1 0 1'))
+        self.assertTrue(m.is_accepted('0 0 1 1 1 1'))
+        self.assertTrue(m.is_accepted('1 1 0 0'))
+        self.assertTrue(m.is_accepted('0 1 0 1 0 1 0'))
+        self.assertTrue(m.is_accepted('0 1 0 1 0 1 1'))
+        self.assertTrue(m.is_accepted('0 0 0 0 1 0 0 0 1 0 1 0 1 1'))
 
         self.assertFalse(m.is_accepted('1'))
         self.assertFalse(m.is_accepted('0'))
-        self.assertFalse(m.is_accepted('11'))
-        self.assertFalse(m.is_accepted('1111111'))
+        self.assertFalse(m.is_accepted('1 1'))
+        self.assertFalse(m.is_accepted('1 1 1 1 1 1 1'))
 
     def test_next_states(self):
         m = FSM()
@@ -58,7 +52,3 @@ class FSMTestCase(unittest.TestCase):
         self.assertEqual(m.next_states('A'), {'A', 'B'})
         self.assertEqual(m.next_states('B'), {'A', 'B', 'C'})
         self.assertEqual(m.next_states('C'), set())
-
-
-if __name__ == '__main__':
-    unittest.main()

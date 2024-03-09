@@ -1,6 +1,6 @@
 from natsort import natsorted
 from finite_state_automaton import FiniteStateAutomaton as FSM
-from typing import Set, Tuple
+from typing import Set, Tuple, List
 from queue import Queue
 
 initial_symbol = '$'
@@ -52,11 +52,12 @@ def rename_states(m: FSM, prefix: str = 'q') -> FSM:
     return m_new
 
 
-def generate_PTA(words: Set[str], draw_PTA=False) -> FSM:
+def generate_PTA(words: List[str], sep=' ', draw_PTA=False) -> FSM:
     """Generate a PTA from the given set of words.
     Note that it uses special symbols for the initial and final states.
 
     :param words: set of words
+    :param sep: separator between symbols in the words (default: whitespace)
     :param draw_PTA: whether to draw the PTA (default: False)
     :return: PTA
     """
@@ -75,10 +76,15 @@ def generate_PTA(words: Set[str], draw_PTA=False) -> FSM:
     m.alphabet.add(final_symbol)
 
     # For each word, we will create a linear chain of states to accept it.
+    state_counter = 1
     for word in words:
+        # convert whitespace-separated word to a sequence of events
+        word = word.split(sep=sep)
+
         assert len(word) > 0
-        first_state = f's{len(m.states)}'  # the first state for the given word
+        first_state = f's{state_counter}'  # the first state for the given word
         m.states.add(first_state)
+        state_counter += 1
 
         # add the epsilon transition (with the special initial symbol) from the initial state to the first state
         m.transitions.setdefault((m.initial_state, initial_symbol), set()).add(first_state)
@@ -91,9 +97,10 @@ def generate_PTA(words: Set[str], draw_PTA=False) -> FSM:
 
             # update the FSM
             m.alphabet.add(symbol)
-            next_state = f's{len(m.states)}'
+            next_state = f's{state_counter}'
             m.states.add(next_state)
             m.transitions.setdefault((current_state, symbol), set()).add(next_state)
+            state_counter += 1
 
             # update the current state
             current_state = next_state
@@ -213,18 +220,19 @@ def infer_model(future_map: dict, draw_inferred_model=False) -> FSM:
     return m
 
 
-def ktail(words: Set[str], k: int, shorten_state_names=True, print_internals=False) -> FSM:
+def ktail(words: List[str], k: int, sep=' ', shorten_state_names=True, print_internals=False) -> FSM:
     """The k-tail algorithm that infers a model from a set of words and a given k.
 
-    :param words: set of words
+    :param words: list of words (each word is a whitespace-separated sequence of symbols by default)
     :param k: the parameter k
+    :param sep: separator between symbols in the words (default: whitespace)
     :param shorten_state_names: whether to shorten state names (default: True)
     :param print_internals: whether to print the internal steps (default: False)
     :return: inferred model
     """
 
     # Step1: Generate a PTA from the given set of words
-    m = generate_PTA(words, draw_PTA=print_internals)
+    m = generate_PTA(words, sep=sep, draw_PTA=print_internals)
 
     # (optional) print the future k-sequences for each state and the k-equivalent classes
     if print_internals:
@@ -242,7 +250,6 @@ def ktail(words: Set[str], k: int, shorten_state_names=True, print_internals=Fal
 
     # Step2: Compute the future map from the PTA
     future_map = k_future_mapping(m, k, print_map=print_internals)
-    print(future_map)
 
     # Step3: Infer the model from the future map
     m_k = infer_model(future_map)
@@ -256,10 +263,10 @@ def ktail(words: Set[str], k: int, shorten_state_names=True, print_internals=Fal
 
 if __name__ == '__main__':
     k = 2
-    words = {
-        'ab',
-        'abb',
-        'abbb'
-    }
-    m = ktail(words=words, k=k, print_internals=True)
+    words = [
+        'a b',
+        'a b b',
+        'a b b b'
+    ]
+    m = ktail(words=words, k=k, sep=' ', print_internals=False)
     m.draw(f'{k}-tail-result')
