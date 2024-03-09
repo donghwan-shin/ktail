@@ -1,7 +1,7 @@
 import unittest
 
 from finite_state_automaton import FiniteStateAutomaton as FSM
-from ktail import generate_PTA, get_k_future, k_future_mapping, rename_states, infer_model, ktail
+from ktail import generate_PTA, get_k_future, k_future_mapping, rename_states, ktail
 
 
 class TestMain(unittest.TestCase):
@@ -137,3 +137,6 @@ class TestMain(unittest.TestCase):
             'hello hello world'
         ]
         m = ktail(words=words, k=k)
+        self.assertTrue(m.is_accepted("$ hello world #"))
+        self.assertTrue(m.is_accepted("$ hello hello world #"))
+        self.assertTrue(m.is_accepted("$ hello hello hello hello hello world #"))

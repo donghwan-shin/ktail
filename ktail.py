@@ -1,7 +1,6 @@
 from natsort import natsorted
 from finite_state_automaton import FiniteStateAutomaton as FSM
 from typing import Set, Tuple, List
-from queue import Queue
 
 initial_symbol = '$'
 final_symbol = '#'
