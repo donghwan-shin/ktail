@@ -47,7 +47,11 @@ class FiniteStateAutomaton:
             current_states = next_states
         return any(state in self.final_states for state in current_states)
 
-    def draw(self, name='fsm.dot'):
+    def draw(self, name='fsm'):
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        name = f'{name}_{timestamp}'
+
         import graphviz
         dot = graphviz.Digraph('finite_state_machine', filename=f'{name}.gv')
         dot.attr(rankdir='LR', size='8,5')
