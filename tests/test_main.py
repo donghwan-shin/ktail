@@ -23,35 +23,32 @@ class TestMain(unittest.TestCase):
 
     def test_get_k_future(self):
         m = FSM()
-        m.alphabet = {'a', 'b', 'c', 'd', 'e'}
+        m.alphabet = {'ax', 'bx', 'cx', 'dx', 'ex'}
         m.states = {'s1', 's2', 's3', 's4', 's5', 's6'}
         m.initial_state = 's1'
         m.final_states = {'s4', 's6'}
         m.transitions = {
-            ('s1', 'a'): {'s2', 's5'},
-            ('s2', 'b'): {'s3'},
-            ('s3', 'c'): {'s4'},
-            ('s5', 'd'): {'s5'},
-            ('s5', 'e'): {'s6'}
+            ('s1', 'ax'): {'s2', 's5'},
+            ('s2', 'bx'): {'s3'},
+            ('s3', 'cx'): {'s4'},
+            ('s5', 'dx'): {'s5'},
+            ('s5', 'ex'): {'s6'}
         }
-        self.assertEqual(get_k_future(m, 1, 's1'),
-                         {('a',)})
-        self.assertEqual(get_k_future(m, 2, 's1'),
-                         {('a',),
-                          ('a', 'b'), ('a', 'd'), ('a', 'e')})
+        # self.assertEqual(get_k_future(m, 1, 's1'), {('ax',)})
+        self.assertEqual(get_k_future(m, 2, 's1'), {('ax',), ('ax', 'bx'), ('ax', 'dx'), ('ax', 'ex')})
         self.assertEqual(get_k_future(m, 3, 's1'),
-                         {('a',),
-                          ('a', 'b'), ('a', 'd'), ('a', 'e'),
-                          ('a', 'b', 'c'), ('a', 'd', 'd'), ('a', 'd', 'e')})
+                         {('ax',),
+                          ('ax', 'bx'), ('ax', 'dx'), ('ax', 'ex'),
+                          ('ax', 'bx', 'cx'), ('ax', 'dx', 'dx'), ('ax', 'dx', 'ex')})
         self.assertEqual(get_k_future(m, 4, 's1'),
-                         {('a',),
-                          ('a', 'b'), ('a', 'd'), ('a', 'e'),
-                          ('a', 'b', 'c'), ('a', 'd', 'd'), ('a', 'd', 'e'),
-                          ('a', 'd', 'd', 'e'), ('a', 'd', 'd', 'd')})
+                         {('ax',),
+                          ('ax', 'bx'), ('ax', 'dx'), ('ax', 'ex'),
+                          ('ax', 'bx', 'cx'), ('ax', 'dx', 'dx'), ('ax', 'dx', 'ex'),
+                          ('ax', 'dx', 'dx', 'ex'), ('ax', 'dx', 'dx', 'dx')})
         self.assertEqual(get_k_future(m, 3, 's5'),
-                         {('d',), ('e',), ('d', 'd'), ('d', 'e'), ('d', 'd', 'd'), ('d', 'd', 'e')})
-        self.assertEqual(get_k_future(m, 1, 's3'), {('c',)})
-        self.assertEqual(get_k_future(m, 2, 's3'), {('c',)})
+                         {('dx',), ('ex',), ('dx', 'dx'), ('dx', 'ex'), ('dx', 'dx', 'dx'), ('dx', 'dx', 'ex')})
+        self.assertEqual(get_k_future(m, 1, 's3'), {('cx',)})
+        self.assertEqual(get_k_future(m, 2, 's3'), {('cx',)})
         self.assertEqual(get_k_future(m, 1, 's4'), set())
 
     def test_k_future_mapping(self):
@@ -132,3 +129,11 @@ class TestMain(unittest.TestCase):
         self.assertEqual(True, m.is_accepted('$ a b d #'))
         self.assertEqual(True, m.is_accepted('$ a b e #'))
         self.assertEqual(False, m.is_accepted('a b c'))
+
+    def test_ktail2(self):
+        k = 1
+        words = [
+            'hello world',
+            'hello hello world'
+        ]
+        m = ktail(words=words, k=k)

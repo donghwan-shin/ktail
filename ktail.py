@@ -132,7 +132,7 @@ def get_k_future(m: FSM, k: int, curr_state: str, print_futures=False) -> Set[Tu
 
     if k == 1:
         # base case
-        futures = {tuple(symbol) for symbol in m.alphabet if (curr_state, symbol) in m.transitions.keys()}
+        futures = {tuple({symbol}) for symbol in m.alphabet if (curr_state, symbol) in m.transitions.keys()}
         if print_futures:
             print(f'k={k}, curr_state={curr_state}, futures={futures}')
         return futures
@@ -143,7 +143,7 @@ def get_k_future(m: FSM, k: int, curr_state: str, print_futures=False) -> Set[Tu
             if (curr_state, symbol) in m.transitions.keys():
                 next_states = m.transitions[(curr_state, symbol)]
                 for next_state in next_states:
-                    futures |= {tuple(symbol) + suffix for suffix in get_k_future(m, k - 1, next_state)}
+                    futures |= {tuple({symbol}) + suffix for suffix in get_k_future(m, k - 1, next_state)}
         if print_futures:
             print(f'k={k}, curr_state={curr_state}, futures={futures}')
         return futures
