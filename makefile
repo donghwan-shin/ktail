@@ -1,3 +1,6 @@
+install:
+	pip install -r requirements.txt
+
 clean:
 	rm -f *.pdf tests/*.pdf
 	rm -f *.dot tests/*.dot
