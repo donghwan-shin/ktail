@@ -36,3 +36,11 @@ Otherwise, you can run the tests in `tests` manually (e.g., `pytest -v`).
 ## Run
 
 Simply run `ktail.py` or `model_inference_exercise.ipynb` with your beloved IDE (e.g., PyCharm) or terminal.
+
+## Author
+
+Donghwan Shin (https://dshin.info)
+
+## License
+
+Educational Community License, Version 2.0 (see [LICENSE](LICENSE) for more details)
