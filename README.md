@@ -37,6 +37,25 @@ Otherwise, you can run the tests in `tests` manually (e.g., `pytest -v`).
 
 Simply run `ktail.py` or `model_inference_exercise.ipynb` with your beloved IDE (e.g., PyCharm) or terminal.
 
+For example, run `ktail.py` will execute the following code:
+```python
+if __name__ == '__main__':
+    k = 2
+    words = [
+        'a b',
+        'a b b',
+        'a b b b'
+    ]
+    m = ktail(words=words, k=k, sep=' ', print_internals=False)
+    m.draw(f'{k}-tail-result')
+```
+
+As a result, it will infer a model from a set of traces T={ab, abb, abbb} and return the model as follows:
+<img width="700" alt="image" src="https://github.com/donghwan-shin/ktail/assets/12538465/a4fee708-7286-41d0-a43b-33b254d28958">
+
+Note that $ and # are special symbols for the transitions with initial and final states. 
+
+
 ## Author
 
 Donghwan Shin (https://dshin.info)
